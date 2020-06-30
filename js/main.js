@@ -3,6 +3,7 @@
 var OBJECT_COUNT = 25;
 
 var documentPhotoObjects = [];
+var documentCommentObject = [];
 
 var descriptions = ['Наконец-то дома!', 'Мой типичный день:', 'Воспоминания: 2 года назад', 'Надеюсь веруться'];
 
@@ -41,6 +42,7 @@ var generatePhotoObject = function () {
 var createPhotoData = function () {
   for (var i = 0; i < OBJECT_COUNT; i++) {
     documentPhotoObjects.push(generatePhotoObject());
+    documentCommentObject.push(generateCommentObject());
   }
 };
 
@@ -49,7 +51,7 @@ var fillPhotosTemplate = function (photoObject) {
   var userPhoto = userPictureTemplate.cloneNode(true);
   userPhoto.querySelector('.picture__img').src = photoObject.url;
   userPhoto.querySelector('.picture__likes').textContent = photoObject.likes;
-  userPhoto.querySelector('.picture__comments').textContent = photoObject.comments;
+  userPhoto.querySelector('.picture__comments').textContent = documentCommentObject.length;
   return userPhoto;
 };
 
