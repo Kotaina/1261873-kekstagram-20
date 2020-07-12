@@ -66,3 +66,43 @@ var renderPhotoGrid = function (userPhotoElement) {
 
 createPhotoData();
 renderPhotoGrid(documentPhotoObjects);
+
+// Вторая чаасть
+
+var fullSize = function (photoObject) {
+  var bigPicture = document.querySelector('.big-picture');
+  bigPicture.classList.remove('hidden');
+  // bigPicture.querySelector('.big-picture__img').src = photoObject.url;
+  bigPicture.querySelector('.likes-count').textContent = randomiser(0, 250);
+  bigPicture.querySelector('.comments-count').textContent = randomiser(0, 300);
+};
+
+var usersComment = function () {
+  var comments = document.querySelector('.social__comment').content.querySelector('.social-picture');
+  var userComment = comments.cloneNode(true).
+    userComment.querySelector('img').src = 'img/avatar-' + randomiser(1, 6) + '.svg';
+  userComment.querySelector('img').alt = 'names[randomiser(1, names.length)]';
+  userComment.querySelector('social__text').textContent = messages[randomiser(1, messages.length)];
+  return userComment;
+};
+
+var createUsersComment = function (userComment) {
+  var commentList = document.querySelector('.social__comments');
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < 4; i++) {
+    fragment.appendChild(usersComment(userComment[i]));
+  }
+  commentList.appendChild(fragment);
+};
+
+var hidingTest = function () {
+  document.querySelector('.social__comment-count').classList.add('hidden');
+  document.querySelector('.comments-loader').classList.add('hidden');
+};
+
+document.querySelector('body').classList.add('modal-open');
+
+fullSize();
+usersComment();
+hidingTest();
+createUsersComment();
