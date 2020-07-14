@@ -2,7 +2,7 @@
 
 var OBJECT_COUNT = 25;
 
-var documentPhotoObjects = [];
+var mockData = [];
 var documentCommentObject = [];
 
 var descriptions = ['Наконец-то дома!', 'Мой типичный день:', 'Воспоминания: 2 года назад', 'Надеюсь веруться'];
@@ -39,9 +39,9 @@ var generatePhotoObject = function () {
   return photoObject;
 };
 
-var createPhotoData = function () {
+var createPhotosData = function () {
   for (var i = 0; i < OBJECT_COUNT; i++) {
-    documentPhotoObjects.push(generatePhotoObject());
+    mockData.push(generatePhotoObject());
     documentCommentObject.push(generateCommentObject());
   }
 };
@@ -64,45 +64,50 @@ var renderPhotoGrid = function (userPhotoElement) {
   pictureList.appendChild(fragment);
 };
 
-createPhotoData();
-renderPhotoGrid(documentPhotoObjects);
+createPhotosData();
+renderPhotoGrid(mockData);
 
 // Вторая чаасть
 
-var fullSize = function (photoObject) {
+var COMMENTS_COUNT = 6;
+
+var openFullPicture = function (photoObject) {
   var bigPicture = document.querySelector('.big-picture');
   bigPicture.classList.remove('hidden');
-  // bigPicture.querySelector('.big-picture__img').src = photoObject.url;
+  bigPicture.querySelector('.big-picture__img').querySelector('img').src = photoObject.url;
   bigPicture.querySelector('.likes-count').textContent = randomiser(0, 250);
   bigPicture.querySelector('.comments-count').textContent = randomiser(0, 300);
 };
 
-var usersComment = function () {
-  var comments = document.querySelector('.social__comment').content.querySelector('.social-picture');
-  var userComment = comments.cloneNode(true).
-    userComment.querySelector('img').src = 'img/avatar-' + randomiser(1, 6) + '.svg';
+var createUserComment = function () {
+  var comments = document.querySelector('.social__comment');
+  var userComment = comments.cloneNode(true);
+  userComment.querySelector('img').src = 'img/avatar-' + randomiser(1, 6) + '.svg';
   userComment.querySelector('img').alt = 'names[randomiser(1, names.length)]';
-  userComment.querySelector('social__text').textContent = messages[randomiser(1, messages.length)];
+  userComment.querySelector('.social__text').textContent = messages[randomiser(0, messages.length)];
   return userComment;
 };
 
-var createUsersComment = function (userComment) {
+var generateUsersComments = function (userComment) {
   var commentList = document.querySelector('.social__comments');
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < 4; i++) {
-    fragment.appendChild(usersComment(userComment[i]));
+  for (var i = 0; i < COMMENTS_COUNT; i++) {
+    fragment.appendChild(createUserComment(userComment[i]));
   }
   commentList.appendChild(fragment);
 };
 
-var hidingTest = function () {
+var hideContent = function () {
   document.querySelector('.social__comment-count').classList.add('hidden');
   document.querySelector('.comments-loader').classList.add('hidden');
 };
 
-document.querySelector('body').classList.add('modal-open');
+var scrollBlocker = function () {
+  document.querySelector('body').classList.add('modal-open');
+};
 
-fullSize();
-usersComment();
-hidingTest();
-createUsersComment();
+openFullPicture(mockData[0]);
+createUserComment();
+hideContent();
+generateUsersComments(documentCommentObject[0]);
+scrollBlocker();
