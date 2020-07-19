@@ -3,7 +3,7 @@
 var OBJECT_COUNT = 25;
 
 var mockData = [];
-var documentCommentObject = [];
+var commentObject = [];
 
 var descriptions = ['Наконец-то дома!', 'Мой типичный день:', 'Воспоминания: 2 года назад', 'Надеюсь веруться'];
 
@@ -42,7 +42,7 @@ var generatePhotoObject = function () {
 var createPhotosData = function () {
   for (var i = 0; i < OBJECT_COUNT; i++) {
     mockData.push(generatePhotoObject());
-    documentCommentObject.push(generateCommentObject());
+    commentObject.push(generateCommentObject());
   }
 };
 
@@ -51,7 +51,7 @@ var fillPhotosTemplate = function (photoObject) {
   var userPhoto = userPictureTemplate.cloneNode(true);
   userPhoto.querySelector('.picture__img').src = photoObject.url;
   userPhoto.querySelector('.picture__likes').textContent = photoObject.likes;
-  userPhoto.querySelector('.picture__comments').textContent = documentCommentObject.length;
+  userPhoto.querySelector('.picture__comments').textContent = commentObject.length;
   return userPhoto;
 };
 
@@ -73,7 +73,7 @@ var COMMENTS_COUNT = 6;
 
 var openFullPicture = function (photoObject) {
   var bigPicture = document.querySelector('.big-picture');
-  bigPicture.classList.remove('hidden');
+  // bigPicture.classList.remove('hidden');
   bigPicture.querySelector('.big-picture__img').querySelector('img').src = photoObject.url;
   bigPicture.querySelector('.likes-count').textContent = randomiser(0, 250);
   bigPicture.querySelector('.comments-count').textContent = randomiser(0, 300);
@@ -109,5 +109,97 @@ var scrollBlocker = function () {
 openFullPicture(mockData[0]);
 createUserComment();
 hideContent();
-generateUsersComments(documentCommentObject[0]);
+generateUsersComments(commentObject[0]);
 scrollBlocker();
+
+// Загрузка файлов
+
+var imageUploadOverlay = document.querySelector('.img-upload__overlay');
+var uploadButton = document.getElementById('upload-file');
+var overlayCloseButton = imageUploadOverlay.querySelector('.img-upload__cancel');
+// var uploadFile = document.getElementById('upload-file');
+
+var KEYCODE = {
+  ESC: 'Escape',
+  ENTER: 'Enter'
+};
+
+var closeUploadOverlay = function () {
+  imageUploadOverlay.classList.add('hidden');
+  // uploadFile.value = 0;
+};
+
+var openUploadOverlay = function (evt) {
+  scrollBlocker();
+  imageUploadOverlay.classList.remove('hidden');
+  overlayCloseButton.addEventListener('click', closeUploadOverlay);
+  addEventListener('keydown', onOverlayEscDown);
+  overlayCloseButton.addEventListener('keydown', function () {
+    if (evt.key === KEYCODE.ENTER) {
+      evt.preventDefault();
+      closeUploadOverlay();
+    }
+  });
+};
+
+var onOverlayEscDown = function (evt) {
+  if (evt.key === KEYCODE.ESC) {
+    evt.preventDefault();
+    closeUploadOverlay();
+  }
+};
+
+uploadButton.addEventListener('change', openUploadOverlay);
+
+// Хэштеги
+
+var hashtagInput = imageUploadOverlay.querySelector('.text__hashtags');
+var hashtagArray;
+
+var MIN_HASH_LENGTH = 2;
+var MAX_HASH_LENGTH = 20;
+
+var hashtagCollector = function () {
+  var hashtags = hashtagInput.value;
+  hashtagArray = hashtags.split(' ');
+};
+
+var hashtagExpressionValidator = function () {
+  for (var i = 0; i < hashtagArray.length; i++) {
+    var validExpression = /^#[a-zа-яA-ZА-Я0-9]*$/;
+    if (!validExpression.test(hashtagArray[i])) {
+      hashtagInput.setCustomValidity('Введены недопустимые знаки');
+      break;
+    }
+  }
+};
+
+var hashtagLengthValidator = function () {
+  hashtagInput.addEventListener('input', function () {
+    var hashtagLength = hashtagInput.value.length;
+
+    if (hashtagLength < MIN_HASH_LENGTH) {
+      hashtagInput.setCustomValidity('Хештег должен состоять минимум из двух символов');
+    } else if (hashtagLength < MAX_HASH_LENGTH) {
+      hashtagInput.setCustomValidity('Длина не может превышать 20 символов');
+    } else {
+      hashtagInput.setCustomValidity(' ');
+    }
+  });
+};
+
+var fullHashtagValidation = function () {
+  hashtagCollector();
+  hashtagExpressionValidator();
+  hashtagLengthValidator();
+};
+
+fullHashtagValidation();
+
+hashtagInput.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onOverlayEscDown);
+});
+
+hashtagInput.addEventListener('blur', function () {
+  document.addEventListener('keydown', onOverlayEscDown);
+});
