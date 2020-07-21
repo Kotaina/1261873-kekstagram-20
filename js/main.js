@@ -73,7 +73,6 @@ var COMMENTS_COUNT = 6;
 
 var openFullPicture = function (photoObject) {
   var bigPicture = document.querySelector('.big-picture');
-  // bigPicture.classList.remove('hidden');
   bigPicture.querySelector('.big-picture__img').querySelector('img').src = photoObject.url;
   bigPicture.querySelector('.likes-count').textContent = randomiser(0, 250);
   bigPicture.querySelector('.comments-count').textContent = randomiser(0, 300);
@@ -115,9 +114,8 @@ scrollBlocker();
 // Загрузка файлов
 
 var imageUploadOverlay = document.querySelector('.img-upload__overlay');
-var uploadButton = document.getElementById('upload-file');
+var uploadButton = document.querySelector('#upload-file');
 var overlayCloseButton = imageUploadOverlay.querySelector('.img-upload__cancel');
-// var uploadFile = document.getElementById('upload-file');
 
 var KEYCODE = {
   ESC: 'Escape',
@@ -126,75 +124,68 @@ var KEYCODE = {
 
 var closeUploadOverlay = function () {
   imageUploadOverlay.classList.add('hidden');
-  // uploadFile.value = 0;
+  uploadButton.value = '';
+};
+var bindListeners = function () {
+  document.addEventListener('keydown', onOverlayEscDown);
+  overlayCloseButton.addEventListener('click', closeUploadOverlay);
 };
 
-var openUploadOverlay = function (evt) {
+var openBigPicture = function () {
   scrollBlocker();
   imageUploadOverlay.classList.remove('hidden');
-  overlayCloseButton.addEventListener('click', closeUploadOverlay);
-  addEventListener('keydown', onOverlayEscDown);
-  overlayCloseButton.addEventListener('keydown', function () {
-    if (evt.key === KEYCODE.ENTER) {
-      evt.preventDefault();
-      closeUploadOverlay();
-    }
-  });
+  bindListeners();
 };
 
 var onOverlayEscDown = function (evt) {
   if (evt.key === KEYCODE.ESC) {
-    evt.preventDefault();
     closeUploadOverlay();
   }
 };
 
-uploadButton.addEventListener('change', openUploadOverlay);
+uploadButton.addEventListener('change', openBigPicture);
 
 // Хэштеги
-
 var hashtagInput = imageUploadOverlay.querySelector('.text__hashtags');
-var hashtagArray;
 
-var MIN_HASH_LENGTH = 2;
-var MAX_HASH_LENGTH = 20;
+var hashtagValidation = function () {
+  var MIN_HASH_LENGTH = 2;
+  var MAX_HASH_LENGTH = 20;
+  var hashtagFlag = false;
 
-var hashtagCollector = function () {
-  var hashtags = hashtagInput.value;
-  hashtagArray = hashtags.split(' ');
-};
-
-var hashtagExpressionValidator = function () {
-  for (var i = 0; i < hashtagArray.length; i++) {
-    var validExpression = /^#[a-zа-яA-ZА-Я0-9]*$/;
-    if (!validExpression.test(hashtagArray[i])) {
-      hashtagInput.setCustomValidity('Введены недопустимые знаки');
-      break;
+  var hashtagExpressionValidator = function () {
+    var hashtagArray = hashtagInput.value.split(' ');
+    for (var i = 0; i < hashtagArray.length; i++) {
+      var validExpression = /^#[a-zа-яA-ZА-Я0-9]*$/;
+      if (!validExpression.test(hashtagArray[i])) {
+        hashtagInput.setCustomValidity('Введены недопустимые знаки');
+      } else {
+        hashtagInput.setCustomValidity(' ');
+        hashtagFlag = true;
+      }
     }
-  }
-};
+  };
 
-var hashtagLengthValidator = function () {
-  hashtagInput.addEventListener('input', function () {
+  var hashtagLengthValidator = function () {
     var hashtagLength = hashtagInput.value.length;
-
     if (hashtagLength < MIN_HASH_LENGTH) {
       hashtagInput.setCustomValidity('Хештег должен состоять минимум из двух символов');
-    } else if (hashtagLength < MAX_HASH_LENGTH) {
+    } else if (hashtagLength > MAX_HASH_LENGTH) {
       hashtagInput.setCustomValidity('Длина не может превышать 20 символов');
     } else {
       hashtagInput.setCustomValidity(' ');
     }
-  });
-};
+  };
 
-var fullHashtagValidation = function () {
-  hashtagCollector();
+
   hashtagExpressionValidator();
-  hashtagLengthValidator();
+
+  if (hashtagFlag) {
+    hashtagLengthValidator();
+  }
 };
 
-fullHashtagValidation();
+hashtagInput.addEventListener('input', hashtagValidation);
 
 hashtagInput.addEventListener('focus', function () {
   document.removeEventListener('keydown', onOverlayEscDown);
@@ -203,3 +194,14 @@ hashtagInput.addEventListener('focus', function () {
 hashtagInput.addEventListener('blur', function () {
   document.addEventListener('keydown', onOverlayEscDown);
 });
+
+
+// Фильтр
+
+var effectToggler = imageUploadOverlay.querySelector('.effect-level__pin');
+
+var effectTogglerMoving = function () {
+  console.log('Кнопка отпущена');
+};
+
+effectToggler.addEventListener('mouseup', effectTogglerMoving);
