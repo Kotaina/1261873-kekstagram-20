@@ -20,6 +20,11 @@ var randomiser = function (start, end) {
   return randomElement;
 };
 
+var KEYCODE = {
+  ESC: 'Escape',
+  ENTER: 'Enter'
+};
+
 var generateCommentObject = function () {
   var userComment = {
     avatar: 'img/avatar-' + randomiser(1, 6) + '.svg',
@@ -34,7 +39,7 @@ var generatePhotoObject = function () {
     url: 'photos/' + randomiser(1, 25) + '.jpg',
     description: descriptions,
     likes: randomiser(15, 200),
-    comments: generateCommentObject()
+    comments: randomiser(1, 10)
   };
   return photoObject;
 };
@@ -51,7 +56,7 @@ var fillPhotosTemplate = function (photoObject) {
   var userPhoto = userPictureTemplate.cloneNode(true);
   userPhoto.querySelector('.picture__img').src = photoObject.url;
   userPhoto.querySelector('.picture__likes').textContent = photoObject.likes;
-  userPhoto.querySelector('.picture__comments').textContent = commentObject.length;
+  userPhoto.querySelector('.picture__comments').textContent = photoObject.comments;
   return userPhoto;
 };
 
@@ -109,7 +114,6 @@ openFullPicture(mockData[0]);
 createUserComment();
 hideContent();
 generateUsersComments(commentObject[0]);
-scrollBlocker();
 
 // Загрузка файлов
 
@@ -117,13 +121,9 @@ var imageUploadOverlay = document.querySelector('.img-upload__overlay');
 var uploadButton = document.querySelector('#upload-file');
 var overlayCloseButton = imageUploadOverlay.querySelector('.img-upload__cancel');
 
-var KEYCODE = {
-  ESC: 'Escape',
-  ENTER: 'Enter'
-};
-
 var closeUploadOverlay = function () {
   imageUploadOverlay.classList.add('hidden');
+  document.querySelector('body').classList.remove('modal-open');
   uploadButton.value = '';
 };
 var bindListeners = function () {
@@ -131,7 +131,7 @@ var bindListeners = function () {
   overlayCloseButton.addEventListener('click', closeUploadOverlay);
 };
 
-var openBigPicture = function () {
+var openUploadOverlay = function () {
   scrollBlocker();
   imageUploadOverlay.classList.remove('hidden');
   bindListeners();
@@ -143,45 +143,86 @@ var onOverlayEscDown = function (evt) {
   }
 };
 
-uploadButton.addEventListener('change', openBigPicture);
+uploadButton.addEventListener('change', openUploadOverlay);
 
 // Хэштеги
 var hashtagInput = imageUploadOverlay.querySelector('.text__hashtags');
 
 var hashtagValidation = function () {
-  var MIN_HASH_LENGTH = 2;
-  var MAX_HASH_LENGTH = 20;
-  var hashtagFlag = false;
+  var hashtagArray = [];
+  var MIN_HASHTAG_LENGTH = 2;
+  var MAX_HASHTAG_LENGTH = 20;
+  var MAX_HASHTAG_QUANTITY = 5;
+  var isExpressionPass = false;
+  var isHashtagQuantity = false;
+  var isHashtagLengthValidity = false;
+
+  var USER_VALIDITY_MESSAGE = {
+    HASHTAG_MIN_LENGTH: 'Хештег должен состоять минимум из двух символов',
+    HASHTAG_MAX_LENGTH: 'Длина не может превышать 20 символов',
+    HASHTAG_WRONG_SYMBOLS: 'Введены недопустимые знаки',
+    HASHTAG_MAX_QUANTITY: 'Максимальное количество хештегов - 5',
+    HASHTAG_DUPLICATE: 'Нельзя использовать одинаковые хештеги'
+  };
 
   var hashtagExpressionValidator = function () {
-    var hashtagArray = hashtagInput.value.split(' ');
+    hashtagArray = hashtagInput.value.split(' ');
+    // console.log(hashtagArray);
+    var validExpression = /^#[a-zа-яA-ZА-Я0-9]*$/;
     for (var i = 0; i < hashtagArray.length; i++) {
-      var validExpression = /^#[a-zа-яA-ZА-Я0-9]*$/;
       if (!validExpression.test(hashtagArray[i])) {
-        hashtagInput.setCustomValidity('Введены недопустимые знаки');
+        hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_WRONG_SYMBOLS);
       } else {
         hashtagInput.setCustomValidity(' ');
-        hashtagFlag = true;
+        isExpressionPass = true;
       }
+    }
+  };
+
+  hashtagExpressionValidator();
+
+  var hashtagQuantityValidator = function () {
+    if (hashtagArray.length <= MAX_HASHTAG_QUANTITY) {
+      hashtagInput.setCustomValidity(' ');
+      isHashtagQuantity = true;
+    } else {
+      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_MAX_QUANTITY);
     }
   };
 
   var hashtagLengthValidator = function () {
     var hashtagLength = hashtagInput.value.length;
-    if (hashtagLength < MIN_HASH_LENGTH) {
-      hashtagInput.setCustomValidity('Хештег должен состоять минимум из двух символов');
-    } else if (hashtagLength > MAX_HASH_LENGTH) {
-      hashtagInput.setCustomValidity('Длина не может превышать 20 символов');
+    if (hashtagLength < MIN_HASHTAG_LENGTH) {
+      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_MIN_LENGTH);
+    } else if (hashtagLength > MAX_HASHTAG_LENGTH) {
+      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_MAX_LENGTH);
     } else {
       hashtagInput.setCustomValidity(' ');
+      isHashtagLengthValidity = true;
     }
   };
 
+  var hashtagDuplicateValidator = function () {
+    var compareArray = hashtagArray;
 
-  hashtagExpressionValidator();
+    for (var i = 0; i < hashtagArray.length; i++) {
+      var cacheElement = hashtagArray[i];
+      for (var j = i + 1; j < compareArray.length + 1; j++) {
+        if (cacheElement === compareArray[j]) {
+          hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_DUPLICATE);
+        }
+      }
+    }
+  };
 
-  if (hashtagFlag) {
-    hashtagLengthValidator();
+  if (isExpressionPass) {
+    hashtagQuantityValidator();
+    if (isHashtagQuantity) {
+      hashtagLengthValidator();
+      if (isHashtagLengthValidity) {
+        hashtagDuplicateValidator();
+      }
+    }
   }
 };
 
@@ -195,13 +236,100 @@ hashtagInput.addEventListener('blur', function () {
   document.addEventListener('keydown', onOverlayEscDown);
 });
 
-
 // Фильтр
 
 var effectToggler = imageUploadOverlay.querySelector('.effect-level__pin');
 
-var effectTogglerMoving = function () {
+var onEffectTogglerMouseUp = function () {
   console.log('Кнопка отпущена');
 };
 
-effectToggler.addEventListener('mouseup', effectTogglerMoving);
+effectToggler.addEventListener('mouseup', onEffectTogglerMouseUp);
+
+
+// Открытие любой фотографии
+var fullsizePicture = document.querySelector('.big-picture');
+var bigPictureCloseButton = fullsizePicture.querySelector('.big-picture__cancel');
+
+var openBigPicture = function () {
+  scrollBlocker();
+  fullsizePicture.classList.remove('hidden');
+  bigPictureBindListeners();
+  thumbnailReader();
+};
+
+var pictureURL;
+
+var thumbnailReader = function () {
+  var thumbnailPicture = document.querySelector('.picture');
+  var thumbNail = thumbnailPicture.cloneNode(true);
+  // console.log(thumbNail);
+  pictureURL = thumbNail.querySelector('.picture__img').src;
+  // console.log(pictureURL);
+  // thumbNail.querySelector('.picture__likes').textContent = photoObject.likes;
+  // thumbNail.querySelector('.picture__comments').textContent = commentObject.length;
+  return thumbNail;
+};
+
+var bigPictureBindListeners = function () {
+  bigPictureCloseButton.addEventListener('click', closeBigPicture);
+  document.addEventListener('keydown', bigPictureEscDown);
+};
+
+var closeBigPicture = function () {
+  fullsizePicture.classList.add('hidden');
+  document.querySelector('body').classList.remove('modal-open');
+};
+
+var bigPictureEscDown = function (evt) {
+  if (evt.key === KEYCODE.ESC) {
+    closeBigPicture();
+  }
+};
+
+var thumbnailEnterDown = function (evt) {
+  if (evt.key === KEYCODE.ENTER) {
+    openBigPicture();
+  }
+};
+
+var thumbNails = document.querySelectorAll('.picture__img');
+
+var addThumbnailHandler = function () {
+  for (var i = 0; i < OBJECT_COUNT; i++) {
+    thumbNails[i].addEventListener('click', function () {
+      openBigPicture();
+    });
+  }
+};
+
+addThumbnailHandler();
+document.addEventListener('keydown', thumbnailEnterDown);
+
+// Валидация комментария
+var commentField = imageUploadOverlay.querySelector('.text__description');
+
+var commentValidation = function () {
+  var commentLength = commentField.value.length;
+  var MAX_COMMENT_LENGTH = 140;
+
+  if (commentLength > MAX_COMMENT_LENGTH) {
+    commentField.setCustomValidity('Комментарий не может превышать 140 символов');
+  } else {
+    commentField.setCustomValidity(' ');
+  }
+};
+
+var commentValidator = function () {
+  commentField.addEventListener('input', commentValidation);
+};
+
+commentField.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onOverlayEscDown);
+});
+
+commentField.addEventListener('blur', function () {
+  document.addEventListener('keydown', onOverlayEscDown);
+});
+
+commentValidator();
