@@ -230,7 +230,7 @@ if (commentLength > MAX_COMMENT_LENGTH) {
   commentField.setCustomValidity('Комментарий не может превышать 140 символов');
 }
 
-// // Открытие любой фотографии
+// Открытие любой фотографии
 var fullSizeView = document.querySelector('.big-picture');
 var fullSizeViewCloseButton = fullSizeView.querySelector('.big-picture__cancel');
 var fullSizePictureContainer = document.querySelector('.big-picture__img');
