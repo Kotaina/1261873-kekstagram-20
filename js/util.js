@@ -1,34 +1,58 @@
 'use strict';
 
 (function () {
-  var util = {};
+  var ESC_KEY = 'Escape';
+  var ENTER_KEY = 'Enter';
+  var utils = {};
 
-  var randomiser = function (start, end) {
-    var randomElement = Math.floor(Math.random() * end) + start;
-    return randomElement;
+  var debounce = function (callBack, intervalal) {
+    var lastTimeout = null;
+    return function () {
+      var parameters = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        callBack.apply(null, parameters);
+      }, intervalal);
+    };
   };
 
-  var scrollBlocker = function () {
-    document.querySelector('body').classList.add('modal-open');
+  var getRandomNumber = function (minNumber, maxNumber) {
+    var randomNum = Math.floor(Math.random() * maxNumber);
+    return randomNum > minNumber ? randomNum : minNumber;
   };
 
+  var fisherYates = function (array, length) {
+    var len = length < array.length ? length : array.length;
+    var copy = array.slice(0);
+    var result = [];
+    var temp;
 
-  var OBJECT_COUNT = 25;
-  var COMMENTS_COUNT = 6;
+    for (var i = 0; i < len; i++) {
+      temp = getRandomNumber(0, copy.length - 1);
+      result.push(copy.splice(temp, 1)[0]);
+    }
 
-
-  var KEYCODE = {
-    ESC: 'Escape',
-    ENTER: 'Enter'
+    return result;
   };
 
+  var keyboard = {
+    isEscEvent: function (evt, callback) {
+      if (evt.key === ESC_KEY) {
+        callback();
+      }
+    },
+    isEnterEvent: function (evt, callback) {
+      if (evt.key === ENTER_KEY) {
+        callback();
+      }
+    }
+  };
 
-  util.randomiser = randomiser;
-  util.scrollBlocker = scrollBlocker;
-  util.OBJECT_COUNT = OBJECT_COUNT;
-  util.COMMENTS_COUNT = COMMENTS_COUNT;
-  util.KEYCODE = KEYCODE;
-
-  window.util = util;
+  utils.getRandomNumber = getRandomNumber;
+  utils.fisherYates = fisherYates;
+  utils.keyboard = keyboard;
+  utils.debounce = debounce;
+  window.utils = utils;
 })();
-
