@@ -1,60 +1,52 @@
 'use strict';
 
 (function () {
-  var validation = {};
+  var HASHTAGS_MAX_COUNT = 5;
+  var HASHTAG_REG_EXP = /^#([а-я]|[А-Я]|[a-zA-Z]|[0-9]){1,20}$/;
 
-  var hashtagInput = window.uploadPhoto.imageUploadOverlay.querySelector('.text__hashtags');
+  var USER_MESSAGE = {
+    LESS_THEN_FIVE: 'Нельзя указать больше пяти хэш-тегов',
+    NO_DUPLICATES: 'один и тот же хэш-тег не может быть использован дважды',
+    CORRECT: 'Не верный формат хештега'
+  };
 
-  var hashtagValidator = function () {
-    var USER_VALIDITY_MESSAGE = {
-      HASHTAG_MIN_LENGTH: 'Хештег должен состоять минимум из двух символов',
-      HASHTAG_MAX_LENGTH: 'Длина не может превышать 20 символов',
-      HASHTAG_WRONG_SYMBOLS: 'Введены недопустимые знаки',
-      HASHTAG_MAX_QUANTITY: 'Максимальное количество хештегов - 5',
-      HASHTAG_DUPLICATE: 'Нельзя использовать одинаковые хештеги',
-      MAX_HASHTAG_QUANTITY: 5
-    };
-    var VALID_EXPRESSION = /^#[a-zа-яA-ZА-Я0-9]*$/;
+  var inputHashtags = document.querySelector('.text__hashtags');
 
-    var hashtagArray = hashtagInput.value.replace(/ +/g, ' ').trim().toLowerCase().split(' ');
+  var onInputHashtagsKeyup = function () {
+    var hashtagsArr = inputHashtags.value.replace(/ +/g, ' ').trim().toLowerCase().split(' ');
 
-    var isExpressionPass = hashtagArray.every(function (item) {
-      return VALID_EXPRESSION.test(item);
+    var isHashtagsLessThanFive = hashtagsArr.length <= HASHTAGS_MAX_COUNT;
+
+    var isHashtagCorrect = hashtagsArr.every(function (item) {
+      return item === '' || HASHTAG_REG_EXP.test(item);
     });
-    var isHastagsNoDuplicates = hashtagArray.every(function (item, index, array) {
+
+    var isHastagsNoDuplicates = hashtagsArr.every(function (item, index, array) {
       return array.indexOf(item) === index;
     });
 
+    inputHashtags.setCustomValidity('');
+
+    if (!isHashtagsLessThanFive) {
+      inputHashtags.setCustomValidity(USER_MESSAGE.LESS_THEN_FIVE);
+    }
+
+    if (!isHashtagCorrect) {
+      inputHashtags.setCustomValidity(USER_MESSAGE.CORRECT);
+    }
+
     if (!isHastagsNoDuplicates) {
-      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_DUPLICATE);
+      inputHashtags.setCustomValidity(USER_MESSAGE.NO_DUPLICATES);
+    }
+
+    if (isHashtagCorrect && isHastagsNoDuplicates && isHashtagsLessThanFive) {
+      inputHashtags.style.border = '';
+      inputHashtags.style.background = '';
     } else {
-      hashtagInput.setCustomValidity('');
-    }
-
-    if (!isExpressionPass) {
-      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_WRONG_SYMBOLS);
-    }
-
-    if (hashtagArray.length > USER_VALIDITY_MESSAGE.MAX_HASHTAG_QUANTITY) {
-      hashtagInput.setCustomValidity(USER_VALIDITY_MESSAGE.HASHTAG_MAX_QUANTITY);
+      inputHashtags.style.border = '2px solid red';
+      inputHashtags.style.background = 'pink';
     }
   };
 
-  validation.hashtagInput = hashtagInput;
-  validation.hashtagValidator = hashtagValidator;
-
-  var commentField = window.uploadPhoto.imageUploadOverlay.querySelector('.text__description');
-
-  var commentLength = commentField.value.length;
-  var MAX_COMMENT_LENGTH = 140;
-
-  if (commentLength > MAX_COMMENT_LENGTH) {
-    commentField.setCustomValidity('Комментарий не может превышать 140 символов');
-  }
-
-  // ----------------------
-
-  validation.commentField = commentField;
-
-  window.validation = validation;
+  inputHashtags.addEventListener('keyup', onInputHashtagsKeyup);
 })();
