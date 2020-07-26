@@ -1,58 +1,98 @@
 'use strict';
 
 (function () {
-  var uploadPhoto = {};
+  var uploadOverlay = document.querySelector('.img-upload__overlay');
+  var effectSlider = document.querySelector('.effect-level');
+  var uploadBtn = document.querySelector('#upload-file');
+  var closeBtn = document.querySelector('#upload-cancel');
+  var form = document.querySelector('.img-upload__form');
+  var uploadFileInput = form.querySelector('.img-upload__input');
+  var inputHashtags = document.querySelector('.text__hashtags');
+  var textDescription = document.querySelector('.text__description');
 
-  var imageUploadOverlay = document.querySelector('.img-upload__overlay');
-  var uploadButton = document.querySelector('#upload-file');
-  var overlayCloseButton = imageUploadOverlay.querySelector('.img-upload__cancel');
+  // импорт сторонних модулей
+  var userMessage = window.userMessage;
+  var photoSize = window.photoSize;
+  var effects = window.effects;
+  var keyboard = window.utils.keyboard;
 
-  var closeUploadOverlay = function () {
-    imageUploadOverlay.classList.add('hidden');
+  var resetFormValues = function () {
+    photoSize.resetValues();
+    effects.resetValues();
+    inputHashtags.value = '';
+    textDescription.value = '';
+    uploadFileInput.value = '';
+  };
+
+  var onPopupEscPress = function (evt) {
+    keyboard.isEscEvent(evt, closePopup);
+  };
+
+  // открывает попап
+  var openPopup = function () {
+    document.querySelector('body').classList.add('modal-open');
+    uploadOverlay.classList.remove('hidden');
+    effectSlider.classList.add('hidden');
+    // + обработчики
+    closeBtn.addEventListener('click', closePopup);
+    document.addEventListener('keydown', onPopupEscPress);
+  };
+
+  // закрывает попап
+  var closePopup = function () {
     document.querySelector('body').classList.remove('modal-open');
-    uploadButton.value = '';
+    uploadOverlay.classList.add('hidden');
+    resetFormValues();
+    // - обработчики
+    closeBtn.removeEventListener('click', openPopup);
+    document.removeEventListener('keydown', onPopupEscPress);
   };
 
-  var bindListeners = function () {
-    document.addEventListener('keydown', onOverlayEscDown);
+  closeBtn.addEventListener('keydown', function (evt) {
+    keyboard.isEscEvent(evt, closePopup);
+  });
 
-    overlayCloseButton.addEventListener('click', closeUploadOverlay);
+  // Если фокус находится в области ввода хэштега/комментария - окно закрываться не должно.
+  inputHashtags.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onPopupEscPress);
+  });
 
-    window.validation.hashtagInput.addEventListener('input', window.validation.hashtagValidator);
+  textDescription.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onPopupEscPress);
+  });
 
-    window.validation.hashtagInput.addEventListener('focus', function () {
-      document.removeEventListener('keydown', onOverlayEscDown);
-    });
+  inputHashtags.addEventListener('blur', function () {
+    document.addEventListener('keydown', onPopupEscPress);
+  });
 
-    window.validation.hashtagInput.addEventListener('blur', function () {
-      document.addEventListener('keydown', onOverlayEscDown);
-    });
+  textDescription.addEventListener('blur', function () {
+    document.addEventListener('keydown', onPopupEscPress);
+  });
 
-    window.validation.commentField.addEventListener('focus', function () {
-      document.removeEventListener('keydown', onOverlayEscDown);
-    });
+  inputHashtags.addEventListener('keydown', function (evt) {
+    keyboard.isEnterEvent(evt, openPopup);
+  });
 
-    window.validation.commentField.addEventListener('blur', function () {
-      document.addEventListener('keydown', onOverlayEscDown);
-    });
+  textDescription.addEventListener('keydown', function (evt) {
+    keyboard.isEnterEvent(evt, openPopup);
+  });
+
+  var onUpload = function () {
+    closePopup();
+    userMessage.showSuccess();
   };
 
-  var onUploadOverlayOpen = function () {
-    window.util.scrollBlocker();
-    imageUploadOverlay.classList.remove('hidden');
-    bindListeners();
+  var onError = function () {
+    closePopup();
+    userMessage.showError();
   };
 
-  var onOverlayEscDown = function (evt) {
-    if (evt.key === window.util.KEYCODE.ESC) {
-      closeUploadOverlay();
-    }
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    var formData = new FormData(form);
+    window.api.uploadData(formData, onUpload, onError);
   };
 
-  uploadButton.addEventListener('change', onUploadOverlayOpen);
-
-
-  uploadPhoto.imageUploadOverlay = imageUploadOverlay;
-
-  window.uploadPhoto = uploadPhoto;
+  form.addEventListener('submit', onFormSubmit);
+  uploadBtn.addEventListener('change', openPopup);
 })();
