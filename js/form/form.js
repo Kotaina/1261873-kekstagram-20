@@ -52,8 +52,6 @@
   uploadButton.addEventListener('change', onUploadOverlayOpen);
 
 
-  // -----------------------------
-
   uploadPhoto.imageUploadOverlay = imageUploadOverlay;
 
   window.uploadPhoto = uploadPhoto;
