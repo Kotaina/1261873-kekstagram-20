@@ -6,7 +6,6 @@
 
   var onLoad = function (photosData) {
     renderPhotos(photosData);
-
     window.photosData = photosData;
   };
 
@@ -52,6 +51,6 @@
 
   photoGrid.renderPhotos = renderPhotos;
   photoGrid.dropPhotos = dropPhotos;
-  window.gallery = photoGrid;
+  window.photoGrid = photoGrid;
   window.api.loadData(onLoad, onError);
 })();
