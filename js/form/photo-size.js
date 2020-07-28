@@ -6,12 +6,13 @@
     MIN: 25,
     STEP: 25,
     MEASURE: '%',
+    DEFAULT: 10
   };
 
   var scale = document.querySelector('.scale');
   var scaleControlInput = document.querySelector('.scale__control--value');
   var fullsizePhoto = document.querySelector('.img-upload__preview');
-  var scaleControlValue = parseInt(scaleControlInput.value, 10);
+  var scaleControlValue = parseInt(scaleControlInput.value, scaleParam.DEFAULT);
 
   var photoSize = {};
 
@@ -22,7 +23,7 @@
 
   var setPhotoSize = function (value) {
     scaleControlInput.value = value + scaleParam.MEASURE;
-    fullsizePhoto.style.transform = 'scale(' + value / 100 + ')';
+    fullsizePhoto.style.transform = 'scale(' + value / scaleParam.MAX + ')';
   };
 
   var onScaleButtonClick = function (evt) {

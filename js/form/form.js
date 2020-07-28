@@ -52,7 +52,6 @@
     keyboard.isEscEvent(evt, closePopup);
   });
 
-  // Если фокус находится в области ввода хэштега/комментария - окно закрываться не должно.
   inputHashtags.addEventListener('focus', function () {
     document.removeEventListener('keydown', onPopupEscPress);
   });

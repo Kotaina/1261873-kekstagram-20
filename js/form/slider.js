@@ -7,6 +7,10 @@
   var barDepth = rangeSlider.querySelector('.effect-level__depth');
   var slider = {};
 
+  var percentPreset = {
+    MAX: 100
+  };
+
   var initializeSlider = function (callBack) {
     pin.addEventListener('mousedown', function (evt) {
       if (typeof callBack === 'function') {
@@ -16,15 +20,15 @@
   };
 
   var resetSliderValues = function () {
-    pin.style.left = 100 + '%';
-    barDepth.style.width = 100 + '%';
-    barInput.value = 100;
+    pin.style.left = percentPreset.MAX + '%';
+    barDepth.style.width = percentPreset.MAX + '%';
+    barInput.value = percentPreset.MAX;
   };
 
   var updateSliderValues = function (ratio) {
-    pin.style.left = (ratio * 100) + '%';
-    barDepth.style.width = (ratio * 100) + '%';
-    barInput.value = Math.round(ratio * 100);
+    pin.style.left = (ratio * percentPreset.MAX) + '%';
+    barDepth.style.width = (ratio * percentPreset.MAX) + '%';
+    barInput.value = Math.round(ratio * percentPreset.MAX);
   };
 
   var onPinMousedown = function (evt, action) {
