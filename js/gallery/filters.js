@@ -34,13 +34,14 @@
     imgFilters.classList.remove('img-filters--inactive');
   };
 
-  var onFiltersFormMouseDown = function (evt) {
+  var onFiltersForm = function (evt) {
     var btns = document.querySelectorAll('.img-filters__button');
     btns.forEach(function (item) {
       item.classList.remove('img-filters__button--active');
     });
     evt.target.classList.add('img-filters__button--active');
   };
+
 
   var onFiltersFormClick = function (evt) {
     var photoGrid = window.photoGrid;
@@ -52,7 +53,9 @@
     photoGrid.renderPhotos(filtredData);
   };
 
-  filtersForm.addEventListener('mousedown', onFiltersFormMouseDown);
+  filtersForm.addEventListener('mousedown', onFiltersForm);
+  filtersForm.addEventListener('keyup', onFiltersForm);
+
   filtersForm.addEventListener('click', utils.debounce(onFiltersFormClick, DEBOUNCE_INTERVAL));
   initializeFilters();
 })();
