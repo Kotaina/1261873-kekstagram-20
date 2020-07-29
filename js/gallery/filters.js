@@ -4,6 +4,9 @@
   var PICTURES_AMOUNT = 10;
   var DEBOUNCE_INTERVAL = 500;
   var filtersForm = document.querySelector('.img-filters__form');
+  var btns = document.querySelectorAll('.img-filters__button');
+  var imgFilters = document.querySelector('.img-filters');
+
 
   var utils = window.utils;
 
@@ -30,12 +33,10 @@
   };
 
   var initializeFilters = function () {
-    var imgFilters = document.querySelector('.img-filters');
     imgFilters.classList.remove('img-filters--inactive');
   };
 
-  var onFiltersForm = function (evt) {
-    var btns = document.querySelectorAll('.img-filters__button');
+  var onFiltersFormMouseDown = function (evt) {
     btns.forEach(function (item) {
       item.classList.remove('img-filters__button--active');
     });
@@ -53,8 +54,8 @@
     photoGrid.renderPhotos(filtredData);
   };
 
-  filtersForm.addEventListener('mousedown', onFiltersForm);
-  filtersForm.addEventListener('keyup', onFiltersForm);
+  filtersForm.addEventListener('mousedown', onFiltersFormMouseDown);
+  filtersForm.addEventListener('keyup', onFiltersFormMouseDown);
 
   filtersForm.addEventListener('click', utils.debounce(onFiltersFormClick, DEBOUNCE_INTERVAL));
   initializeFilters();

@@ -3,9 +3,15 @@
 (function () {
   var photoGrid = {};
   var pictures = document.querySelector('.pictures');
+  var pictureTemplate = document.querySelector('#picture');
+
 
   var onLoad = function (photosData) {
-    renderPhotos(photosData);
+    var appPhotos = photosData.map(function (currentValue, index) {
+      currentValue.id = index;
+      return currentValue;
+    });
+    renderPhotos(appPhotos);
     window.photosData = photosData;
   };
 
@@ -22,7 +28,6 @@
   };
 
   var createPhoto = function (photoCard) {
-    var pictureTemplate = document.querySelector('#picture');
     var picture = pictureTemplate.content.cloneNode(true);
 
     picture.querySelector('.picture').setAttribute('id', photoCard.id);
@@ -43,7 +48,6 @@
   var renderPhotos = function (photosData) {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < photosData.length; i++) {
-      photosData[i].id = i;
       fragment.appendChild(createPhoto(photosData[i]));
     }
     pictures.appendChild(fragment);

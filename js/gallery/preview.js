@@ -50,9 +50,7 @@
   };
 
   var clearCommentsList = function () {
-    while (commentsList.firstChild) {
-      commentsList.firstChild.remove();
-    }
+    commentsList.innerHTML = '';
   };
 
   var renderCommentsList = function (commentsArray) {
@@ -90,12 +88,12 @@
 
   var getPictureData = function (pictureId, data) {
     var picture = data.find(function (item) {
-      return +item.id === +pictureId;
+      return item.id === Number(pictureId);
     });
     return picture;
   };
 
-  var openBigImage = function (evt) {
+  var onPicturesContainerClick = function (evt) {
     var clickedPicture = evt.target.closest('.picture');
 
     if (clickedPicture === null) {
@@ -109,7 +107,7 @@
     document.addEventListener('keydown', onImageKeydown);
   };
 
-  var closeBigImage = function () {
+  var onCloseButtonClick = function () {
     document.querySelector('.big-picture').classList.add('hidden');
     document.querySelector('body').classList.remove('modal-open');
 
@@ -118,7 +116,7 @@
   };
 
   var closeImageByEsc = function () {
-    closeBigImage();
+    onCloseButtonClick();
   };
 
   var onImageKeydown = function (evt) {
@@ -129,9 +127,9 @@
     var closeButton = document.querySelector('#picture-cancel');
     var picturesContainer = document.querySelector('.pictures');
 
-    closeButton.addEventListener('click', closeBigImage);
+    closeButton.addEventListener('click', onCloseButtonClick);
 
-    picturesContainer.addEventListener('click', openBigImage);
+    picturesContainer.addEventListener('click', onPicturesContainerClick);
   };
 
   bigImageSettings();

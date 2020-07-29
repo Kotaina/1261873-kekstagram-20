@@ -4,6 +4,7 @@
   var effectsList = document.querySelector('.effects__list');
   var fullsizePhoto = document.querySelector('.img-upload__preview');
   var effectSlider = document.querySelector('.effect-level');
+  var defaultEffectItem = effectsList.querySelector('#effect-none');
 
   var effects = {};
   var slider = window.slider;
@@ -64,7 +65,7 @@
   };
 
   var resetEffect = function () {
-    effectsList.querySelector('#effect-none').checked = true;
+    defaultEffectItem.checked = true;
     fullsizePhoto.className = 'img-upload__preview ' + EFFECT.none.className;
   };
 

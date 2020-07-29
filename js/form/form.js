@@ -9,6 +9,7 @@
   var uploadFileInput = form.querySelector('.img-upload__input');
   var inputHashtags = document.querySelector('.text__hashtags');
   var textDescription = document.querySelector('.text__description');
+  var modalBody = document.querySelector('body');
 
   // импорт сторонних модулей
   var userMessage = window.userMessage;
@@ -30,7 +31,7 @@
 
   // открывает попап
   var openPopup = function () {
-    document.querySelector('body').classList.add('modal-open');
+    modalBody.classList.add('modal-open');
     uploadOverlay.classList.remove('hidden');
     effectSlider.classList.add('hidden');
     // + обработчики
@@ -40,7 +41,7 @@
 
   // закрывает попап
   var closePopup = function () {
-    document.querySelector('body').classList.remove('modal-open');
+    modalBody.classList.remove('modal-open');
     uploadOverlay.classList.add('hidden');
     resetFormValues();
     // - обработчики

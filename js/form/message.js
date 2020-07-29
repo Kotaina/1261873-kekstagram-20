@@ -3,6 +3,8 @@
 (function () {
   var errorBooklet = document.querySelector('#error').content.querySelector('.error');
   var successBooklet = document.querySelector('#success').content.querySelector('.success');
+  var popupsContainer = document.querySelector('main');
+
 
   var keyboard = window.utils.keyboard;
   var userMessage = {};
@@ -50,7 +52,6 @@
   };
 
   var renderFormBooklet = function () {
-    var popupsContainer = document.querySelector('main');
     successBooklet.classList.add('hidden');
     errorBooklet.classList.add('hidden');
     popupsContainer.insertAdjacentElement('afterbegin', successBooklet);
